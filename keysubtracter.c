@@ -19,6 +19,9 @@ email: alberto.bsd@gmail.com
 #include "base58/libbase58.h"
 #include "rmd160/rmd160.h"
 #include "sha256/sha256.h"
+#include <openssl/sha.h>
+#include <openssl/ripemd.h>
+
 
 
 const char *version = "0.1.20210918";
@@ -351,16 +354,16 @@ void generate_straddress(struct Point *publickey,bool compress,char *dst)    {
     len = b58enc(dst,&len,buf);
 }
 
-void generate_strrmd160(struct Point *publickey,bool compress,char *dst)    {
-    unsigned char sha_result[32],rmd_result[20];
-    int len = 32;
-    char buf[65];
-    int i;
-    point2buf(publickey,buf,compress);
-    SHA256((unsigned char *)buf,strlen(buf),sha_result);
-    RMD160((unsigned char *)sha_result,len,rmd_result);
+void generate_strrmd160(struct Point *publickey, bool compress, char *dst) {
+    unsigned char buf[65];
+    unsigned char sha_result[32];
+    unsigned char rmd_result[20];
+    int len;
+    point2buf(publickey, buf, compress);
+    len = sizeof(rmd_result);
+    RMD160((unsigned char *)buf, 65, rmd_result);
     len = sizeof(buf);
-    b58enc(dst,&len,rmd_result);
+    b58enc(dst, &len, rmd_result);
 }
 
 void generate_strpublickey(struct Point *publickey,bool compress,char *dst)    {
